@@ -65,16 +65,39 @@ public:
 	void SaveToFile(string FileName)
 	{
 		FILE* f = fopen(FileName.c_str(), "w");
+		string s;
+		s.append(GetClassName()).append(" ").append(GetName()).append("\n");
+		s.append(std::to_string(GetDistanceFormSun())).append("\n");
+		s.append(std::to_string(GetSize())).append("\n");
+		s.append(std::to_string(GetRotTime())).append("\n");
+		s.append(std::to_string(GetTemperature())).append("\n");
+		s.append(std::to_string(GetRadius())).append("\n");
+		fprintf(f, s.c_str());
 	}
 
 	void print()
 	{
-		
+		string s;
+		s.append(GetClassName()).append(" ").append(GetName()).append("\n");
+		s.append(std::to_string(GetDistanceFormSun())).append("\n");
+		s.append(std::to_string(GetSize())).append("\n");
+		s.append(std::to_string(GetRotTime())).append("\n");
+		s.append(std::to_string(GetTemperature())).append("\n");
+		s.append(std::to_string(GetRadius())).append("\n");
+		cout << s;
 	}
 
-	void ReadFromFile()
+	void ReadFromFile(string FileName)
 	{
-		
+		FILE * f = fopen(FileName.c_str(), "r");
+		string s;
+		fscanf(f, "%s", s);
+		fscanf(f, "%s", _name);
+		fscanf(f, "%i", _distance);
+		fscanf(f, "%i", _size);
+		fscanf(f, "%i", _days);
+		fscanf(f, "%i", _temperature);
+		fscanf(f, "%i", _radius);
 	}
 
 	virtual ~Cosmic_body();
