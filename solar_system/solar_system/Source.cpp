@@ -61,6 +61,22 @@ public:
 	{
 		_radius = radius;
 	}
+
+	void SaveToFile(string FileName)
+	{
+		FILE* f = fopen(FileName.c_str(), "w");
+	}
+
+	void print()
+	{
+		
+	}
+
+	void ReadFromFile()
+	{
+		
+	}
+
 	virtual ~Cosmic_body();
 };
 
