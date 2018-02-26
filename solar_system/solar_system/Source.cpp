@@ -3,11 +3,6 @@
 #include <vector>
 using namespace std;
 
-class planet;
-class carlic_planet;
-class comet;
-class asteroid;
-
 class Cosmic_body
 {
 	string _name;
@@ -31,9 +26,6 @@ class Cosmic_body
 			&Cosmic_body::SetDistanceFromSun,&Cosmic_body::SetSize,&Cosmic_body::SetRotTime,&Cosmic_body::SetTemperature,&Cosmic_body::SetRadius
 		};
 
-		//typedef void(Cosmic_body::*fun)(int);
-		//static fun methods[5] = { &Cosmic_body::SetDistanceFromSun,&Cosmic_body::SetSize,&Cosmic_body::SetRotTime,&Cosmic_body::SetTemperature,&Cosmic_body::SetRadius };
-
 		if (index == 0)
 		{
 			SetName(val);
@@ -53,25 +45,16 @@ class Cosmic_body
 		"¬ведите радиус\n"
 	};
 
-	void ReadFromFile(FILE* f)
-	{
-		fscanf(f, "%s", _name);
-		fscanf(f, "%i", _distance);
-		fscanf(f, "%i", _size);
-		fscanf(f, "%i", _days);
-		fscanf(f, "%i", _temperature);
-		fscanf(f, "%i", _radius);
-	}
 
 public:
-	Cosmic_body();
+	Cosmic_body(){}
 	Cosmic_body(bool fromConsole)
 	{
 		if (fromConsole)
 			ReadFromConsole();
 	}
 
-	virtual string GetClassName();
+	virtual string GetClassName() { return ""; }
 	string GetName()
 	{
 		return _name;
@@ -168,46 +151,24 @@ public:
 		cout << "\n";
 	}
 
-	static Cosmic_body* ReadFromFile(string file, int * size)
+	void ReadFromFile(FILE* f)
 	{
-		*size = 0;
-		Cosmic_body *ff = (Cosmic_body*)malloc(sizeof(Cosmic_body));
-		FILE* f = fopen(file.c_str(), "r");
-		while (1)
-		{
-			if (!feof(f))
-			{
-				ff = (Cosmic_body*)realloc(ff,sizeof(Cosmic_body)*((*size) + 1));
-				Cosmic_body* b;
-				string type;
-				cin >> type;
-				if (type == "planet")
-					b = new planet();
+		fscanf(f, "%s", _name);
+		fscanf(f, "%i", _distance);
+		fscanf(f, "%i", _size);
+		fscanf(f, "%i", _days);
+		fscanf(f, "%i", _temperature);
+		fscanf(f, "%i", _radius);
+	}
 
-				if (type == "carlic_planet")
-					b = new carlic_planet();
 
-				if (type == "asteroid")
-					b = new asteroid();
-
-				if (type == "comet")
-					b = new comet();
-				
-				b->ReadFromFile(f);
-				ff[*size] = (*b);
-			}
-			else break;
-		}
-		return ff;
-	};
-
-	virtual ~Cosmic_body();
+	virtual ~Cosmic_body(){}
 };
 
 class planet : public Cosmic_body
 {
 public:
-	planet() : Cosmic_body() {}
+	planet() {}
 	planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
 	virtual string GetClassName()
@@ -255,8 +216,8 @@ public:
 class Creator
 {
 public:
-	virtual Cosmic_body* FactoryMethod();
-	virtual ~Creator();
+	virtual Cosmic_body* FactoryMethod() { return 0; }
+	virtual ~Creator(){}
 };
 
 class PlanetCreator : public Creator
@@ -319,10 +280,44 @@ string* split(string str, char splitSymbol = ' ')
 	return ret;
 };
 
+static Cosmic_body* ReadFromFile(string file, int * size)
+{
+	*size = 0;
+	Cosmic_body *ff = (Cosmic_body*)malloc(sizeof(Cosmic_body));
+	FILE* f = fopen(file.c_str(), "r");
+	while (1)
+	{
+		if (!feof(f))
+		{
+			ff = (Cosmic_body*)realloc(ff, sizeof(Cosmic_body)*((*size) + 1));
+			Cosmic_body* b;
+			string type;
+			cin >> type;
+			if (type == "planet")
+				b = new planet();
+
+			if (type == "carlic_planet")
+				b = new carlic_planet();
+
+			if (type == "asteroid")
+				b = new asteroid();
+
+			if (type == "comet")
+				b = new comet();
+
+			b->ReadFromFile(f);
+			ff[*size] = (*b);
+		}
+		else break;
+	}
+	return ff;
+};
+
 string mainfile = "system.txt";
 vector<Cosmic_body> ssystem = vector<Cosmic_body>();
 
 void main(void) {
+	setlocale(LC_ALL, "rus");
 	static const size_t count = 4;
 	Creator*creators[] = {
 		&PlanetCreator(),&CarlicPlanetCreator(),&AsteroidCreator(),&CometCreator() };
@@ -357,7 +352,7 @@ void main(void) {
 		if (comArr[0] == "file")
 			if (comArr[1] == "open") {
 				int count = 0;
-				Cosmic_body* bodyes = Cosmic_body::ReadFromFile(mainfile, &count);
+				Cosmic_body* bodyes = ReadFromFile(mainfile, &count);
 				for (int i = 0; i < count; i++)
 					ssystem.push_back(bodyes[i]);
 			}

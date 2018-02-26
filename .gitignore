@@ -37,5 +37,8 @@
 *.filters
 *.user
 *.db
-/solar_system/solar_system/Debug/solar_system.tlog/link-rc.read.1.tlog
 *.tlog
+*.pdb
+/solar_system/Debug/
+/solar_system/solar_system/Debug/
+/solar_system/.vs/
