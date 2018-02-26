@@ -54,7 +54,7 @@ public:
 			ReadFromConsole();
 	}
 
-	virtual string GetClassName() { return ""; }
+	virtual string GetClassName();
 	string GetName()
 	{
 		return _name;
@@ -162,7 +162,7 @@ public:
 	}
 
 
-	virtual ~Cosmic_body(){}
+	virtual ~Cosmic_body() {}
 };
 
 class planet : public Cosmic_body
@@ -171,7 +171,7 @@ public:
 	planet() {}
 	planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	virtual string GetClassName()
+	string GetClassName()
 	{
 		return "planet";
 	}
@@ -183,7 +183,7 @@ public:
 	carlic_planet() {}
 	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	virtual string GetClassName()
+	string GetClassName()
 	{
 		return "carlic_planet";
 	}
@@ -195,7 +195,7 @@ public:
 	asteroid() {}
 	asteroid(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	virtual string GetClassName()
+	string GetClassName()
 	{
 		return "asteroid";
 	}
@@ -207,7 +207,7 @@ public:
 	comet() {}
 	comet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	virtual string GetClassName()
+	string GetClassName()
 	{
 		return "comet";
 	}
@@ -216,14 +216,14 @@ public:
 class Creator
 {
 public:
-	virtual Cosmic_body* FactoryMethod() { return 0; }
-	virtual ~Creator(){}
+	virtual Cosmic_body* FactoryMethod();
+	virtual ~Creator() {}
 };
 
 class PlanetCreator : public Creator
 {
 public:
-	virtual  Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod()
 	{
 		return new planet(true);
 	};
@@ -232,7 +232,7 @@ public:
 class CarlicPlanetCreator : public Creator
 {
 public:
-	virtual  Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod()
 	{
 		return new carlic_planet(true);
 	};
@@ -241,7 +241,7 @@ public:
 class AsteroidCreator : public Creator
 {
 public:
-	virtual  Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod()
 	{
 		return new asteroid(true);
 	};
@@ -250,13 +250,13 @@ public:
 class CometCreator : public Creator
 {
 public:
-	virtual  Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod()
 	{
 		return new comet(true);
 	};
 };
 
-string* split(string str, char splitSymbol = ' ')
+string** split(string str, char splitSymbol = ' ')
 {
 	vector<string> mass = vector<string>();
 	string tmp = "";
@@ -273,9 +273,13 @@ string* split(string str, char splitSymbol = ' ')
 		else
 			tmp.push_back(c);
 	}
-	string* ret = (string*)malloc(sizeof(string)*mass.size());
+
+	if (tmp.length() > 0)
+		mass.push_back(tmp);
+
+	string** ret = (string**)malloc(sizeof(string*)*mass.size());
 	for (int i = 0; i < mass.size(); i++)
-		ret[i] = mass.at(i);
+		ret[i] = new string(mass.at(i));
 
 	return ret;
 };
@@ -324,40 +328,40 @@ void main(void) {
 	string command;
 	while (1) {
 		cout << "Введите команду. Для справки введите help\n";
-		cin >> command;
-		string* comArr = split(command);
-		if (comArr[0] == "save") {
+		getline(cin, command);
+		string** comArr = split(command);
+		if (*comArr[0] == "save") {
 			FILE * f = fopen(mainfile.c_str(), "w");
 			for each (Cosmic_body b in ssystem)
 				b.SaveToFile(mainfile);
 		}
 
-		if (comArr[0] == "input") {
-			if (comArr[1] == "planet")
+		if (*comArr[0] == "input") {
+			if (*comArr[1] == "planet")
 				ssystem.push_back(creators[0]->FactoryMethod());
-			if (comArr[1] == "carlic")
-				if (comArr[2] == "planet")
+			if (*comArr[1] == "carlic")
+				if (*comArr[2] == "planet")
 					ssystem.push_back(creators[1]->FactoryMethod());
-			if (comArr[1] == "asteroid")
+			if (*comArr[1] == "asteroid")
 				ssystem.push_back(creators[2]->FactoryMethod());
-			if (comArr[1] == "comet")
+			if (*comArr[1] == "comet")
 				ssystem.push_back(creators[3]->FactoryMethod());
 		}
 
-		if (comArr[0] == "help")
+		if (*comArr[0] == "help")
 		{
 
 		}
 
-		if (comArr[0] == "file")
-			if (comArr[1] == "open") {
+		if (*comArr[0] == "file")
+			if (*comArr[1] == "open") {
 				int count = 0;
 				Cosmic_body* bodyes = ReadFromFile(mainfile, &count);
 				for (int i = 0; i < count; i++)
 					ssystem.push_back(bodyes[i]);
 			}
 
-		if (comArr[0] == "exit")
+		if (*comArr[0] == "exit")
 			break;
 	}
 
