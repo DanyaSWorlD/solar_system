@@ -54,7 +54,7 @@ public:
 			ReadFromConsole();
 	}
 
-	virtual string GetClassName();
+	virtual string GetClassName() { return "Cosmic_Body"; }
 	string GetName()
 	{
 		return _name;
@@ -108,30 +108,6 @@ public:
 	{
 		return _abort;
 	}
-	void SaveToFile(string FileName)
-	{
-		FILE* f = fopen(FileName.c_str(), "a");
-		string s;
-		s.append(GetClassName()).append(" ").append(GetName()).append("\n");
-		s.append(std::to_string(GetDistanceFormSun())).append("\n");
-		s.append(std::to_string(GetSize())).append("\n");
-		s.append(std::to_string(GetRotTime())).append("\n");
-		s.append(std::to_string(GetTemperature())).append("\n");
-		s.append(std::to_string(GetRadius())).append("\n");
-		fprintf(f, s.c_str());
-	}
-
-	void print()
-	{
-		string s;
-		s.append(GetClassName()).append(" ").append(GetName()).append("\n");
-		s.append(std::to_string(GetDistanceFormSun())).append("\n");
-		s.append(std::to_string(GetSize())).append("\n");
-		s.append(std::to_string(GetRotTime())).append("\n");
-		s.append(std::to_string(GetTemperature())).append("\n");
-		s.append(std::to_string(GetRadius())).append("\n");
-		cout << s;
-	}
 
 	void ReadFromConsole()
 	{
@@ -162,8 +138,33 @@ public:
 	}
 
 
-	virtual ~Cosmic_body() {}
+	~Cosmic_body() {}
 };
+
+void PrintCosmicBody(Cosmic_body body)
+{
+	string s;
+	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
+	s.append(to_string(body.GetDistanceFormSun())).append("\n");
+	s.append(to_string(body.GetSize())).append("\n");
+	s.append(to_string(body.GetRotTime())).append("\n");
+	s.append(to_string(body.GetTemperature())).append("\n");
+	s.append(to_string(body.GetRadius())).append("\n");
+	cout << s;
+}
+
+void SaveToFile(string FileName, Cosmic_body body)
+{
+	FILE* f = fopen(FileName.c_str(), "a");
+	string s;
+	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
+	s.append(to_string(body.GetDistanceFormSun())).append("\n");
+	s.append(to_string(body.GetSize())).append("\n");
+	s.append(to_string(body.GetRotTime())).append("\n");
+	s.append(to_string(body.GetTemperature())).append("\n");
+	s.append(to_string(body.GetRadius())).append("\n");
+	fprintf(f, s.c_str());
+}
 
 class planet : public Cosmic_body
 {
@@ -216,8 +217,11 @@ public:
 class Creator
 {
 public:
-	virtual Cosmic_body* FactoryMethod();
-	virtual ~Creator() {}
+	virtual Cosmic_body* FactoryMethod()
+	{
+		return new planet();
+	}
+	~Creator() {}
 };
 
 class PlanetCreator : public Creator
@@ -333,7 +337,7 @@ void main(void) {
 		if (*comArr[0] == "save") {
 			FILE * f = fopen(mainfile.c_str(), "w");
 			for each (Cosmic_body b in ssystem)
-				b.SaveToFile(mainfile);
+				SaveToFile(mainfile,b);
 		}
 
 		if (*comArr[0] == "input") {
