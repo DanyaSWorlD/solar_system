@@ -48,7 +48,7 @@ class Cosmic_body
 
 public:
 	Cosmic_body(){}
-	Cosmic_body(bool fromConsole)
+	Cosmic_body(bool fromConsole,int wtf)
 	{
 		if (fromConsole)
 			ReadFromConsole();
@@ -112,7 +112,7 @@ public:
 	void ReadFromConsole()
 	{
 		string inp;
-		cout << "Заполните все параметры космического тела. Для отмены введите /stop";
+		cout << "Заполните все параметры космического тела. Для отмены введите /stop\n";
 		for (int i = 0; i < 6; i++)
 		{
 			cout << msgs[i];
@@ -172,7 +172,7 @@ public:
 	planet() {}
 	planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "planet";
 	}
@@ -184,7 +184,7 @@ public:
 	carlic_planet() {}
 	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "carlic_planet";
 	}
@@ -196,7 +196,7 @@ public:
 	asteroid() {}
 	asteroid(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "asteroid";
 	}
@@ -208,7 +208,7 @@ public:
 	comet() {}
 	comet(bool fromConsole) : Cosmic_body(fromConsole) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "comet";
 	}
@@ -219,7 +219,7 @@ class Creator
 public:
 	virtual Cosmic_body* FactoryMethod()
 	{
-		return new planet();
+		return new Cosmic_body();
 	}
 	~Creator() {}
 };
@@ -227,7 +227,7 @@ public:
 class PlanetCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new planet(true);
 	};
@@ -236,7 +236,7 @@ public:
 class CarlicPlanetCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new carlic_planet(true);
 	};
@@ -245,7 +245,7 @@ public:
 class AsteroidCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new asteroid(true);
 	};
@@ -254,7 +254,7 @@ public:
 class CometCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new comet(true);
 	};
@@ -328,9 +328,10 @@ void main(void) {
 	setlocale(LC_ALL, "rus");
 	static const size_t count = 4;
 	Creator*creators[] = {
-		&PlanetCreator(),&CarlicPlanetCreator(),&AsteroidCreator(),&CometCreator() };
+		new PlanetCreator(),new CarlicPlanetCreator(),new AsteroidCreator(),new CometCreator() };
 	string command;
 	while (1) {
+		cin.sync();
 		cout << "Введите команду. Для справки введите help\n";
 		getline(cin, command);
 		string** comArr = split(command);
@@ -341,8 +342,11 @@ void main(void) {
 		}
 
 		if (*comArr[0] == "input") {
-			if (*comArr[1] == "planet")
-				ssystem.push_back(creators[0]->FactoryMethod());
+			if (*comArr[1] == "planet") {
+				Creator *c = creators[0];
+				Cosmic_body*b = c->FactoryMethod();
+				ssystem.push_back(b);
+			}
 			if (*comArr[1] == "carlic")
 				if (*comArr[2] == "planet")
 					ssystem.push_back(creators[1]->FactoryMethod());
