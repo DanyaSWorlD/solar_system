@@ -47,7 +47,7 @@ class Cosmic_body
 
 
 public:
-	Cosmic_body(){}
+	Cosmic_body() {}
 	Cosmic_body(bool fromConsole)
 	{
 		if (fromConsole)
@@ -337,7 +337,7 @@ void main(void) {
 		if (*comArr[0] == "save") {
 			FILE * f = fopen(mainfile.c_str(), "w");
 			for each (Cosmic_body b in ssystem)
-				SaveToFile(mainfile,b);
+				SaveToFile(mainfile, b);
 		}
 
 		if (*comArr[0] == "input") {
@@ -354,7 +354,17 @@ void main(void) {
 
 		if (*comArr[0] == "help")
 		{
-
+			//input
+			cout << "input <тип>\n"
+				<< "Команда позволяет ввести обьект с клавиатуры" << endl
+				<< "тип может быть одним из следующих: planet, carlic planet, asteroid, comet" << endl << endl;
+				
+			//file
+			cout << "file open" << endl
+				<< "считывает данные из файла" << endl << endl;
+			//exit
+			cout << "exit" << endl
+				<< "выход из программы" << endl << endl;
 		}
 
 		if (*comArr[0] == "file")
