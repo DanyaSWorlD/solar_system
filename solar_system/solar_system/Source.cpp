@@ -170,7 +170,7 @@ class planet : public Cosmic_body
 {
 public:
 	planet() {}
-	planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	planet(bool fromConsole) : Cosmic_body(fromConsole,0) {	}
 
 	string GetClassName() override
 	{
@@ -182,7 +182,7 @@ class carlic_planet : public Cosmic_body
 {
 public:
 	carlic_planet() {}
-	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole,0) {	}
 
 	string GetClassName() override
 	{
@@ -194,7 +194,7 @@ class asteroid : public Cosmic_body
 {
 public:
 	asteroid() {}
-	asteroid(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	asteroid(bool fromConsole) : Cosmic_body(fromConsole,0) {	}
 
 	string GetClassName() override
 	{
@@ -206,7 +206,7 @@ class comet : public Cosmic_body
 {
 public:
 	comet() {}
-	comet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	comet(bool fromConsole) : Cosmic_body(fromConsole,0) {	}
 
 	string GetClassName() override
 	{
@@ -322,7 +322,7 @@ static Cosmic_body* ReadFromFile(string file, int * size)
 };
 
 string mainfile = "system.txt";
-vector<Cosmic_body> ssystem = vector<Cosmic_body>();
+vector<Cosmic_body*> ssystem = vector<Cosmic_body*>();
 
 void main(void) {
 	setlocale(LC_ALL, "rus");
@@ -337,8 +337,8 @@ void main(void) {
 		string** comArr = split(command);
 		if (*comArr[0] == "save") {
 			FILE * f = fopen(mainfile.c_str(), "w");
-			for each (Cosmic_body b in ssystem)
-				SaveToFile(mainfile,b);
+			for each (Cosmic_body *b in ssystem)
+				SaveToFile(mainfile,*b);
 		}
 
 		if (*comArr[0] == "input") {
@@ -366,7 +366,7 @@ void main(void) {
 				int count = 0;
 				Cosmic_body* bodyes = ReadFromFile(mainfile, &count);
 				for (int i = 0; i < count; i++)
-					ssystem.push_back(bodyes[i]);
+					ssystem.push_back(&bodyes[i]);
 			}
 
 		if (*comArr[0] == "exit")
