@@ -129,7 +129,7 @@ public:
 		cout << "\n";
 	}
 
-	void ReadFromFile(FILE* f)
+	/*void ReadFromFile(FILE* f)
 	{
 		fscanf(f, "%s", _name);
 		fscanf(f, "%i", _distance);
@@ -137,20 +137,52 @@ public:
 		fscanf(f, "%i", _days);
 		fscanf(f, "%i", _temperature);
 		fscanf(f, "%i", _radius);
+	}*/
+
+	void ReadFromFile(ifstream* fin)
+	{
+		(*fin) >> _name
+			>> _distance
+			>> _size
+			>> _days
+			>> _temperature
+			>> _radius;
 	}
 
+	int getValByIndex(int index)
+	{
+		int(Cosmic_body::*funcs[])() = {
+			&Cosmic_body::GetDistanceFormSun,&Cosmic_body::GetSize,&Cosmic_body::GetRotTime,&Cosmic_body::GetTemperature,&Cosmic_body::GetRadius
+		};
+		return (this->*funcs[index])();
+	}
 
 	~Cosmic_body() {}
 };
 
+string pName[5]
+{
+	"Расстояние до солнца",
+	"Размер",
+	"Время оборота вокруг солнца",
+	"Температура",
+	"Радиус"
+};
+
 void PrintCosmicBody(Cosmic_body* body)
 {
-	cout << body->GetClassName() << " " << body->GetName() << endl
-		<< body->GetDistanceFormSun() << endl
+	cout << body->GetClassName() << " " << body->GetName() << endl;
+	for (int i = 0; i < 5; i++)
+		cout << pName[i] << ": " << body->getValByIndex(i) << ";" << endl;
+	cout << endl;
+
+	/*  << body->GetDistanceFormSun() << endl
 		<< body->GetSize() << endl
 		<< body->GetRotTime() << endl
 		<< body->GetTemperature() << endl
 		<< body->GetRadius() << endl;
+	*/
+
 	/*
 	string s;
 	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
@@ -307,19 +339,20 @@ string** split(string str, char splitSymbol = ' ')
 	return ret;
 };
 
-static Cosmic_body* ReadFromFile(string file, int * size)
+static Cosmic_body** ReadFromFile(string file, int * size)
 {
 	*size = 0;
-	Cosmic_body *ff = (Cosmic_body*)malloc(sizeof(Cosmic_body));
-	FILE* f = fopen(file.c_str(), "r");
+	Cosmic_body **ff = (Cosmic_body**)malloc(sizeof(Cosmic_body*));
+	//FILE* f = fopen(file.c_str(), "r");
+	ifstream fin(file);
 	while (1)
 	{
-		if (!feof(f))
+		if (!fin.eof())
 		{
-			ff = (Cosmic_body*)realloc(ff, sizeof(Cosmic_body)*((*size) + 1));
+			ff = (Cosmic_body**)realloc(ff, sizeof(Cosmic_body*)*((*size) + 1));
 			Cosmic_body* b;
 			string type;
-			cin >> type;
+			fin >> type;
 			if (type == "planet")
 				b = new planet();
 
@@ -332,8 +365,12 @@ static Cosmic_body* ReadFromFile(string file, int * size)
 			if (type == "comet")
 				b = new comet();
 
-			b->ReadFromFile(f);
-			ff[*size] = (*b);
+			if (type == "")
+				break;
+
+			b->ReadFromFile(&fin);
+			ff[*size] = b;
+			(*size)++;
 		}
 		else break;
 	}
@@ -345,8 +382,8 @@ vector<Cosmic_body*> ssystem = vector<Cosmic_body*>();
 
 void main(void) {
 	setlocale(LC_ALL, "rus");
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
+	//SetConsoleCP(1251);
+	//SetConsoleOutputCP(1251);
 	static const size_t count = 4;
 	Creator*creators[] = {
 		new PlanetCreator(),new CarlicPlanetCreator(),new AsteroidCreator(),new CometCreator() };
@@ -354,27 +391,44 @@ void main(void) {
 	while (true) {
 		cout << "Введите команду. Для справки введите help\n";
 		getline(cin, command);
-		
+		if (command == "") {
+			//cin.ignore(INT_MAX, '\n');
+			getline(cin, command);
+		}
+
 		string** comArr = split(command);
+		int commandEx = 0;
 
 		if (*comArr[0] == "input") {
 			if (*comArr[1] == "planet") {
-				Creator *c = creators[0];
-				Cosmic_body*b = c->FactoryMethod();
-				ssystem.push_back(b);
+				ssystem.push_back(creators[0]->FactoryMethod());
+				commandEx++;
 			}
 			if (*comArr[1] == "carlic")
-				if (*comArr[2] == "planet")
+				if (*comArr[2] == "planet") {
 					ssystem.push_back(creators[1]->FactoryMethod());
+					commandEx++;
+				}
 			if (*comArr[1] == "asteroid")
+			{
 				ssystem.push_back(creators[2]->FactoryMethod());
+				commandEx++;
+			}
 			if (*comArr[1] == "comet")
+			{
 				ssystem.push_back(creators[3]->FactoryMethod());
+				commandEx++;
+			}
 		}
 
-		if (*comArr[0] == "show")
-			for each (Cosmic_body *b in ssystem)
-				PrintCosmicBody(b);
+		if (*comArr[0] == "show") {
+			if (ssystem.size() == 0)
+				cout << "Сначала добавьте значения" << endl;
+			else
+				for each (Cosmic_body *b in ssystem)
+					PrintCosmicBody(b);
+			commandEx++;
+		}
 
 		if (*comArr[0] == "help")
 		{
@@ -391,25 +445,45 @@ void main(void) {
 			//exit
 			cout << "exit" << endl
 				<< "выход из программы" << endl << endl;
+
+			commandEx++;
 		}
 
 		if (*comArr[0] == "file") {
 			if (*comArr[1] == "open") {
 				int count = 0;
-				Cosmic_body* bodyes = ReadFromFile(mainfile, &count);
+				Cosmic_body** bodyes = ReadFromFile(mainfile, &count);
 				for (int i = 0; i < count; i++)
-					ssystem.push_back(&bodyes[i]);
+					ssystem.push_back(bodyes[i]);
+				cout << "Успешно!" << endl;
+				commandEx++;
 			}
-			if (*comArr[0] == "save") {
+			if (*comArr[1] == "save") {
 				FILE * f = fopen(mainfile.c_str(), "w");
 				for each (Cosmic_body *b in ssystem)
 					SaveToFile(mainfile, b);
+				cout << "Успешно!" << endl;
+				commandEx++;
 			}
+		}
+
+		if (*comArr[0] == "delete")
+		{
+			int p = stoi(*comArr[1]);
+			ssystem.erase(ssystem.begin()+p);
+			commandEx++;
+		}
+
+		if (*comArr[0] == "clear")
+		{
+			ssystem = vector<Cosmic_body*>();
+			commandEx++;
 		}
 
 		if (*comArr[0] == "exit")
 			break;
 
-		cin.ignore(INT_MAX, '\n');
+		if (commandEx == 0)
+			cout << "Команда не найдена" << endl;
 	}
 }

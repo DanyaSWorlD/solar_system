@@ -1,6 +1,18 @@
-Cosmic_Body Земля
+planet Mars
 1
 2
 3
 4
 5
+planet Venus
+1
+2
+3
+4
+5
+asteroid asteroid
+100000000
+100
+365
+-257
+12231432
