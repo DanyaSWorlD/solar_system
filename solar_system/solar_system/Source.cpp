@@ -333,6 +333,7 @@ void main(void) {
 	while (1) {
 		cout << "Введите команду. Для справки введите help\n";
 		getline(cin, command);
+		
 		string** comArr = split(command);
 		if (*comArr[0] == "save") {
 			FILE * f = fopen(mainfile.c_str(), "w");
@@ -377,6 +378,8 @@ void main(void) {
 
 		if (*comArr[0] == "exit")
 			break;
+		
+		std::cin.ignore(INT_MAX, '\n');
 	}
 
 }
