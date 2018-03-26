@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <Windows.h>
 using namespace std;
 
 class Cosmic_body
@@ -48,7 +50,7 @@ class Cosmic_body
 
 public:
 	Cosmic_body() {}
-	Cosmic_body(bool fromConsole)
+	Cosmic_body(bool fromConsole, int wtf)
 	{
 		if (fromConsole)
 			ReadFromConsole();
@@ -112,7 +114,7 @@ public:
 	void ReadFromConsole()
 	{
 		string inp;
-		cout << "Заполните все параметры космического тела. Для отмены введите /stop";
+		cout << "Заполните все параметры космического тела. Для отмены введите /stop\n";
 		for (int i = 0; i < 6; i++)
 		{
 			cout << msgs[i];
@@ -141,8 +143,15 @@ public:
 	~Cosmic_body() {}
 };
 
-void PrintCosmicBody(Cosmic_body body)
+void PrintCosmicBody(Cosmic_body* body)
 {
+	cout << body->GetClassName() << " " << body->GetName() << endl
+		<< body->GetDistanceFormSun() << endl
+		<< body->GetSize() << endl
+		<< body->GetRotTime() << endl
+		<< body->GetTemperature() << endl
+		<< body->GetRadius() << endl;
+	/*
 	string s;
 	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
 	s.append(to_string(body.GetDistanceFormSun())).append("\n");
@@ -151,28 +160,38 @@ void PrintCosmicBody(Cosmic_body body)
 	s.append(to_string(body.GetTemperature())).append("\n");
 	s.append(to_string(body.GetRadius())).append("\n");
 	cout << s;
+	*/
 }
 
-void SaveToFile(string FileName, Cosmic_body body)
+void SaveToFile(string FileName, Cosmic_body* body)
 {
-	FILE* f = fopen(FileName.c_str(), "a");
-	string s;
-	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
-	s.append(to_string(body.GetDistanceFormSun())).append("\n");
-	s.append(to_string(body.GetSize())).append("\n");
-	s.append(to_string(body.GetRotTime())).append("\n");
-	s.append(to_string(body.GetTemperature())).append("\n");
-	s.append(to_string(body.GetRadius())).append("\n");
-	fprintf(f, s.c_str());
+	ofstream fout(FileName.c_str(), ios_base::app);
+	/*
+	 *string s;
+	 *s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
+	 *s.append(to_string(body.GetDistanceFormSun())).append("\n");
+	 *s.append(to_string(body.GetSize())).append("\n");
+	 *s.append(to_string(body.GetRotTime())).append("\n");
+	 *s.append(to_string(body.GetTemperature())).append("\n");
+	 *s.append(to_string(body.GetRadius())).append("\n");
+	 *fout << s;
+	*/
+
+	fout << body->GetClassName() << " " << body->GetName() << endl
+		<< body->GetDistanceFormSun() << endl
+		<< body->GetSize() << endl
+		<< body->GetRotTime() << endl
+		<< body->GetTemperature() << endl
+		<< body->GetRadius() << endl;
 }
 
 class planet : public Cosmic_body
 {
 public:
 	planet() {}
-	planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	planet(bool fromConsole) : Cosmic_body(fromConsole, 0) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "planet";
 	}
@@ -182,9 +201,9 @@ class carlic_planet : public Cosmic_body
 {
 public:
 	carlic_planet() {}
-	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	carlic_planet(bool fromConsole) : Cosmic_body(fromConsole, 0) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "carlic_planet";
 	}
@@ -194,9 +213,9 @@ class asteroid : public Cosmic_body
 {
 public:
 	asteroid() {}
-	asteroid(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	asteroid(bool fromConsole) : Cosmic_body(fromConsole, 0) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "asteroid";
 	}
@@ -206,9 +225,9 @@ class comet : public Cosmic_body
 {
 public:
 	comet() {}
-	comet(bool fromConsole) : Cosmic_body(fromConsole) {	}
+	comet(bool fromConsole) : Cosmic_body(fromConsole, 0) {	}
 
-	string GetClassName()
+	string GetClassName() override
 	{
 		return "comet";
 	}
@@ -219,7 +238,7 @@ class Creator
 public:
 	virtual Cosmic_body* FactoryMethod()
 	{
-		return new planet();
+		return new Cosmic_body();
 	}
 	~Creator() {}
 };
@@ -227,7 +246,7 @@ public:
 class PlanetCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new planet(true);
 	};
@@ -236,7 +255,7 @@ public:
 class CarlicPlanetCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new carlic_planet(true);
 	};
@@ -245,7 +264,7 @@ public:
 class AsteroidCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new asteroid(true);
 	};
@@ -254,7 +273,7 @@ public:
 class CometCreator : public Creator
 {
 public:
-	Cosmic_body* FactoryMethod()
+	Cosmic_body* FactoryMethod() override
 	{
 		return new comet(true);
 	};
@@ -322,28 +341,28 @@ static Cosmic_body* ReadFromFile(string file, int * size)
 };
 
 string mainfile = "system.txt";
-vector<Cosmic_body> ssystem = vector<Cosmic_body>();
+vector<Cosmic_body*> ssystem = vector<Cosmic_body*>();
 
 void main(void) {
 	setlocale(LC_ALL, "rus");
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 	static const size_t count = 4;
 	Creator*creators[] = {
-		&PlanetCreator(),&CarlicPlanetCreator(),&AsteroidCreator(),&CometCreator() };
+		new PlanetCreator(),new CarlicPlanetCreator(),new AsteroidCreator(),new CometCreator() };
 	string command;
-	while (1) {
+	while (true) {
 		cout << "Введите команду. Для справки введите help\n";
 		getline(cin, command);
 		
 		string** comArr = split(command);
-		if (*comArr[0] == "save") {
-			FILE * f = fopen(mainfile.c_str(), "w");
-			for each (Cosmic_body b in ssystem)
-				SaveToFile(mainfile, b);
-		}
 
 		if (*comArr[0] == "input") {
-			if (*comArr[1] == "planet")
-				ssystem.push_back(creators[0]->FactoryMethod());
+			if (*comArr[1] == "planet") {
+				Creator *c = creators[0];
+				Cosmic_body*b = c->FactoryMethod();
+				ssystem.push_back(b);
+			}
 			if (*comArr[1] == "carlic")
 				if (*comArr[2] == "planet")
 					ssystem.push_back(creators[1]->FactoryMethod());
@@ -353,33 +372,44 @@ void main(void) {
 				ssystem.push_back(creators[3]->FactoryMethod());
 		}
 
+		if (*comArr[0] == "show")
+			for each (Cosmic_body *b in ssystem)
+				PrintCosmicBody(b);
+
 		if (*comArr[0] == "help")
 		{
 			//input
 			cout << "input <тип>\n"
 				<< "Команда позволяет ввести обьект с клавиатуры" << endl
 				<< "тип может быть одним из следующих: planet, carlic planet, asteroid, comet" << endl << endl;
-				
+
 			//file
-			cout << "file open" << endl
-				<< "считывает данные из файла" << endl << endl;
+			cout << "file <команда>" << endl
+				<< "open: считывает данные из файла" << endl
+				<< "save: считывает данные из файла" << endl << endl;
+
 			//exit
 			cout << "exit" << endl
 				<< "выход из программы" << endl << endl;
 		}
 
-		if (*comArr[0] == "file")
+		if (*comArr[0] == "file") {
 			if (*comArr[1] == "open") {
 				int count = 0;
 				Cosmic_body* bodyes = ReadFromFile(mainfile, &count);
 				for (int i = 0; i < count; i++)
-					ssystem.push_back(bodyes[i]);
+					ssystem.push_back(&bodyes[i]);
 			}
+			if (*comArr[0] == "save") {
+				FILE * f = fopen(mainfile.c_str(), "w");
+				for each (Cosmic_body *b in ssystem)
+					SaveToFile(mainfile, b);
+			}
+		}
 
 		if (*comArr[0] == "exit")
 			break;
-		
-		std::cin.ignore(INT_MAX, '\n');
-	}
 
+		cin.ignore(INT_MAX, '\n');
+	}
 }
