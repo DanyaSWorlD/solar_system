@@ -129,16 +129,6 @@ public:
 		cout << "\n";
 	}
 
-	/*void ReadFromFile(FILE* f)
-	{
-		fscanf(f, "%s", _name);
-		fscanf(f, "%i", _distance);
-		fscanf(f, "%i", _size);
-		fscanf(f, "%i", _days);
-		fscanf(f, "%i", _temperature);
-		fscanf(f, "%i", _radius);
-	}*/
-
 	void ReadFromFile(ifstream* fin)
 	{
 		(*fin) >> _name
@@ -175,39 +165,11 @@ void PrintCosmicBody(Cosmic_body* body)
 	for (int i = 0; i < 5; i++)
 		cout << pName[i] << ": " << body->getValByIndex(i) << ";" << endl;
 	cout << endl;
-
-	/*  << body->GetDistanceFormSun() << endl
-		<< body->GetSize() << endl
-		<< body->GetRotTime() << endl
-		<< body->GetTemperature() << endl
-		<< body->GetRadius() << endl;
-	*/
-
-	/*
-	string s;
-	s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
-	s.append(to_string(body.GetDistanceFormSun())).append("\n");
-	s.append(to_string(body.GetSize())).append("\n");
-	s.append(to_string(body.GetRotTime())).append("\n");
-	s.append(to_string(body.GetTemperature())).append("\n");
-	s.append(to_string(body.GetRadius())).append("\n");
-	cout << s;
-	*/
 }
 
 void SaveToFile(string FileName, Cosmic_body* body)
 {
 	ofstream fout(FileName.c_str(), ios_base::app);
-	/*
-	 *string s;
-	 *s.append(body.GetClassName()).append(" ").append(body.GetName()).append("\n");
-	 *s.append(to_string(body.GetDistanceFormSun())).append("\n");
-	 *s.append(to_string(body.GetSize())).append("\n");
-	 *s.append(to_string(body.GetRotTime())).append("\n");
-	 *s.append(to_string(body.GetTemperature())).append("\n");
-	 *s.append(to_string(body.GetRadius())).append("\n");
-	 *fout << s;
-	*/
 
 	fout << body->GetClassName() << " " << body->GetName() << endl
 		<< body->GetDistanceFormSun() << endl
@@ -343,7 +305,6 @@ static Cosmic_body** ReadFromFile(string file, int * size)
 {
 	*size = 0;
 	Cosmic_body **ff = (Cosmic_body**)malloc(sizeof(Cosmic_body*));
-	//FILE* f = fopen(file.c_str(), "r");
 	ifstream fin(file);
 	while (1)
 	{
@@ -382,6 +343,7 @@ vector<Cosmic_body*> ssystem = vector<Cosmic_body*>();
 
 void main(void) {
 	setlocale(LC_ALL, "rus");
+	system("color F0");
 	//SetConsoleCP(1251);
 	//SetConsoleOutputCP(1251);
 	static const size_t count = 4;
@@ -392,7 +354,6 @@ void main(void) {
 		cout << "Введите команду. Для справки введите help\n";
 		getline(cin, command);
 		if (command == "") {
-			//cin.ignore(INT_MAX, '\n');
 			getline(cin, command);
 		}
 
@@ -437,12 +398,16 @@ void main(void) {
 				<< "Команда позволяет ввести обьект с клавиатуры" << endl
 				<< "тип может быть одним из следующих: planet, carlic planet, asteroid, comet" << endl << endl;
 
+			//show
+			cout << "show" << endl
+				<< "Команда предназначена для вывода на экран всех ссозданных космических тел" << endl << endl;
+
 			//file
 			cout << "file <команда>" << endl
 				<< "open: считывает данные из файла" << endl
 				<< "save: считывает данные из файла" << endl << endl;
 
-			//file 
+			//delete
 			cout << "delete [id]" << endl
 				<< "Удаляет запись с оответствующим индексом" << endl << endl;
 
